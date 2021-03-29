@@ -1,12 +1,37 @@
-import React, { useState } from 'react'
-import { View, SafeAreaView ,Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import React, { useState, useEffect } from 'react';
+import { View, SafeAreaView ,Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Logon({ navigation }) {
 
     const [registration, setRegistration] = useState("");
 
+    async function handleLogin() {
+        if (registration !== ""){
+            await AsyncStorage.setItem('@ifma-registration', registration);
+            navigation.navigate('Feed', { registration });
+
+        }
+    }
+
+    useEffect(() => {
+        async function getStorage() {
+            const registration = await AsyncStorage.getItem('@ifma-registration');
+            if (registration) {
+                navigation.navigate('Feed', {registration});
+            }
+        }
+        getStorage();
+    }, [])
+
     return(
         <View style={styles.container}>
+            
+            <Image
+                style={ {height: 120, width: 100 }}
+                source={require('../../../assets/ifma.png')}
+            />
+            
             <TextInput 
             style = {styles.input} 
             placeholder="Matrícula" 
@@ -14,7 +39,7 @@ export default function Logon({ navigation }) {
             />
             <TouchableOpacity 
             style = {styles.button}
-            onPress={(() => navigation.navigate("Feed", { registration } ) )}
+            onPress={handleLogin}
             >
                 <Text style = {styles.title} >Entrar</Text>
             </TouchableOpacity>
@@ -31,11 +56,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     input: {
+        marginTop: 40,
         height: 56,
         backgroundColor: "rgba(255,255,255,0.4)",
         fontSize: 22,
         paddingHorizontal: 10,
         borderRadius: 6,
+        width: 300,
     },
     button: {
         height: 56,
@@ -45,7 +72,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#8b9290",
-        marginTop: 5,
+        marginTop: 40,
     },
     title:{
         fontSize: 24,

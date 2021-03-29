@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react'
-import {SafeAreaView ,Text, StyleSheet, ScrollView, View} from 'react-native'
+import {SafeAreaView ,Text, StyleSheet, ScrollView, View, TouchableOpacity} from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '../../services/api'
 
-export default function Feed({ route }) {
+export default function Feed({ route, navigation }) {
     const { registration } = route.params;
     const [data, setData] = useState({});
 
+    useEffect(() => {
+        navigation.setOptions({
+            headerLeft: null,
+            headerRight: () => (
+                <TouchableOpacity style={{ marginRight: 20 }} 
+                    onPress={ async () => {
+                        await AsyncStorage.clear();
+                        navigation.navigate('Logon');
+                    }}
+                >
+                    <Icon name="exit-outline" size={38} />
+                </TouchableOpacity>
+            ),
+        })
+    }, [])
+    
     useEffect(() => {
         async function getStudent() {
             const response = await api.get(`/class/1/student/${registration}`);
@@ -56,6 +74,7 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     messageTime: {
+        paddingTop: 20,
         fontSize: 18,
         marginTop: 5,
         fontWeight: 'bold',
